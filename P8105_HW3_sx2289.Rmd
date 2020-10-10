@@ -172,12 +172,29 @@ tidy_ny_noaa =
     tmax = tmax / 10,
     tmin = tmin / 10,
   )
+  
 skimr::skim_without_charts(tidy_ny_noaa)
 ```
 
+```{r}
+tidy_ny_noaa %>%
+  filter(snow != "NA") %>%
+  count(snow)%>%
+  filter(snow >= "0")%>%
+  arrange(desc(n))
+```
+
+The most commonly value is 0, which means most of time there is no snow in NY. 
 
 
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+```{r}
+plot_1 = 
+  tidy_ny_noaa %>%
+  
+```
+
 
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
