@@ -214,9 +214,32 @@ geom_path()+
 ggsave("plot_Jan_July.jpg")
 ```
 
-From the graph, we can learned that the temperature keeps relatively stable throughout the 30 years. There was only 2 times that the lowest temperature were below the -10 C and the highest temperature were around the 30 C. For the out liner, we can see some of them fro the graph, but the number of them was very small.
+\From the graph, we can learned that the temperature keeps relatively stable throughout the 30 years. There was only 2 times that the lowest temperature were below the -10 C and the highest temperature were around the 30 C. For the out liner, we can see some of them fro the graph, but the number of them was very small.
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
+```{r}
 plot_i = 
+  tidy_ny_noaa %>%
+   ggplot(aes(x = tmax, y = tmin)) +
+   labs(title = "tmax vs tmin (C)",
+       x = "tmax",
+       y = "tmin")
+
+ggsave("plot_i.jpg")
+```
+
+```{r}
+plot_ii = 
+  filter(between(snow, 1, 100))%>%
+  ggplot(aes(x= year, y = snow))+
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+   labs(title = "The distribution of snowfall values greater than 0 and less than 100 separately by year",
+       x = "Year",
+       y = "Snowfall(mm)")
+
+ggsave("plot_ii.jpg")
+
+plot_i / plot_ii
+```
 
