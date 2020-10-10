@@ -229,17 +229,5 @@ plot_i =
 ggsave("plot_i.jpg")
 ```
 
-```{r}
-plot_ii = 
-  filter(between(snow, 1, 100))%>%
-  ggplot(aes(x= year, y = snow))+
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
-   labs(title = "The distribution of snowfall values greater than 0 and less than 100 separately by year",
-       x = "Year",
-       y = "Snowfall(mm)")
 
-ggsave("plot_ii.jpg")
-
-plot_i / plot_ii
-```
 
