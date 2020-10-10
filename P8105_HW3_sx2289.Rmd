@@ -86,11 +86,30 @@ read_csv("./data/accel_data.csv") %>%
   janitor::clean_names()%>%
   pivot_longer(
     cols = starts_with("activity"),
-    names_to = "counts_each_min",
-    names_prefix = "activity",
+    names_to = "min",
+    names_prefix = "activity_",
     values_to = "activity",
-    values_drop_na = TRUE
-  )
+    values_drop_na = TRUE)%>%
+  mutate(
+    weekend_vs_weekday = case_when(
+      day %in% c("Saturday", "Sunday") ~"weenkend",
+      !(day %in% c("Saturday","Sunday")) ~ "weekday" 
+    )
+  ) %>%
+  mutate(
+    weekend_vs_weekday = as.factor(weekend_vs_weekday),
+    week = as.factor(week),
+    day_id = as.factor(day_id), 
+    day = as.factor(day),
+    min = as.numeric(min),
+    activity = as.numeric(activity)
+  ) %>%
+  mutate(day = forcats::fct_relevel(day,
+                                   c("Monday","Tuesday","Wednesday","Thursday","Friday", "Saturday","Sunday")))%>%
+  group_by(week)%>%
+  arrange(day, .by_group = TRUE)
+
+accelerometer
 ```
 
 This final dataset contains `r nrow(accelerometer)` rows and `r ncol(accelerometer)` columns. Observations in the experiments are the activity counts for each minute of a 24-hour day starting at midnight for five week. There are 1440 activity counts in total. 
@@ -99,16 +118,39 @@ Traditional analyses of accelerometer data focus on the total activity over the 
 
 ```{r}
 accelerometer %>%
-  summarise(total_activity_each_day = sum(activity, na.rm = FALSE)) %>%
+  group_by(week,day)%>%
+  summarise( total_activity_each_day = sum(activity, na.rm = TRUE)) %>%
   pivot_wider(
-    names_from = week,
+    names_from = day,
     values_from = total_activity_each_day
   )%>%
-  knitr::kable()
-
+knitr::kable()
 ```
 
+From the table we can see this individual does bot have a stable activity habit. There is no apparent tends. But we can see n Wednesday, the person has a relatively stable activity but on Sunday, the activity counts each minute are keeping decreasing. 
 
 Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 
-
+```{r}
+accelerometer %>% 
+  group_by(day_id,day, week) %>% 
+  ggplot(aes(x = min,
+             y = activity,
+             color = day,
+             group = day_id))+
+  geom_point()+
+  stat_smooth(
+    se = F,
+    method = "loess",
+    alpha = 0.5
+  )+
+  scale_y_continuous(name = "Hourly Activity Counts", 
+                      trans = "sqrt")+
+   scale_x_continuous(name ="Hours" ,
+                     breaks = c(seq(120,1440,120)), 
+                     labels = c("2am", "4am", "6am", "8am", "10am", "12pm","2pm", "4pm", "6pm","8pm", "10pm", "12am")) +
+  viridis::scale_color_viridis(discrete = T,
+                               name = "")+
+  labs(title = "The 24-Hour activities in 5 Weeks for the 63 year-old male with BMI 25 ")
+```
+From the graph, we can tell that 63 year-old male with BMI 25 usually does activities during the time from around 8 am to 10 pm. Also, he less active during the weekends.
