@@ -14,6 +14,7 @@ devtools::install_github("p8105/p8105.datasets")
 ```
 ```{r}
 library(tidyverse)
+library(ggpubr)
 ```
 
 
@@ -245,6 +246,8 @@ ggsave("plot_ii.jpg")
 ```
 
 ```{r}
+plot_two_panel <- ggarrange(plot_i, plot_ii)
 
+ggsave("plot_two_panel .jpg")
 ```
 
